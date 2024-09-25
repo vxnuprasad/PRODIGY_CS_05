@@ -12,7 +12,7 @@ banner = """
 ╚═╝░░╚══╝╚══════╝░░░╚═╝░░░╚═╝░░╚═╝╚══════╝░░░╚═╝░░░╚══════╝╚══════╝╚═╝░░╚═╝
 """
 print(banner)
-print("------------ Network Packet Analyzer By Techno-rabit ------------\n")
+print("--------------- Network Packet Analyzer By Techno-rabit ---------------\n")
 
 print("-------------------------------- Disclaimer --------------------------------\n")
 print("This packet sniffer tool is intended for educational and ethical purposes only.\n")
