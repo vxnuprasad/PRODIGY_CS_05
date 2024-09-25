@@ -1,3 +1,6 @@
+import sys
+from scapy.all import sniff
+from scapy.layers.inet import IP, TCP, UDP, ICMP
 
 # Banner for the program
 banner = """
@@ -7,8 +10,6 @@ banner = """
 """
 print(banner)
 print("-- Network Packet Analyzer By Techno-rabit --\n")
-
-
 
 print("-------------------------------- Disclaimer --------------------------------\n")
 print("This packet sniffer tool is intended for educational and ethical purposes only.\n")
@@ -27,39 +28,42 @@ if accept_terms.lower() != 'y':
     print("You must accept the terms and conditions before using this tool.")
     sys.exit()
 
-print("\n--------------- Packet Sniffing Tool ---------------")
+# Function to handle packet processing
+def packet_callback(packet):
+    # Check if the packet has an IP layer
+    if packet.haslayer(IP):
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        protocol = None
+        
+        # Determine the protocol type (TCP, UDP, ICMP)
+        if packet.haslayer(TCP):
+            protocol = "TCP"
+        elif packet.haslayer(UDP):
+            protocol = "UDP"
+        elif packet.haslayer(ICMP):
+            protocol = "ICMP"
+        else:
+            protocol = "Other"
 
-import os
-import sys
-from scapy.all import *
+        # Print source, destination, and protocol
+        print(f"Source IP: {ip_src}, Destination IP: {ip_dst}, Protocol: {protocol}")
+        
+        # Display payload data if the packet has a TCP or UDP layer
+        if packet.haslayer(TCP) or packet.haslayer(UDP):
+            print(f"Payload: {bytes(packet[protocol].payload)}\n")
+        else:
+            print(f"No TCP/UDP payload available.\n")
 
-# Defines a function to display and save the captured packets
-def packet_sniff(packet):
-    if packet.haslayer(TCP):
-        src_ip = packet[IP].src
-        dst_ip = packet[IP].dst
-        src_port = packet[TCP].sport
-        dst_port = packet[TCP].dport
-        protocol = packet[IP].proto
-        payload = str(packet[TCP].payload)
+# Function to start packet sniffing on a given interface
+def start_sniffing(interface="eth0", count=10):
+    print(f"Starting packet capture on {interface}...")
+    sniff(iface=interface, prn=packet_callback, count=count)
 
-        output_string = f"Source IP: {src_ip}\n"
-        output_string += f"Destination IP: {dst_ip}\n"
-        output_string += f"Source Port: {src_port}\n"
-        output_string += f"Destination Port: {dst_port}\n"
-        output_string += f"Protocol: {protocol}\n"
-        output_string += f"Payload: {payload[:50]}...\n"
-
-        print(output_string, end='')
-        with open('packet_sniffer_results.txt', 'a') as f:
-            f.write(output_string)
-
-# Sets the path and filename for the output text file
-output_path = "/packet_sniffer_results.txt"
-output_file = os.path.join(output_path, "packet_sniffer_results.txt")
-
-# Calls the sniff() function from the Scapy library to capture and analyze network packets
-sniff(filter="tcp", prn=packet_sniff, store=0, count=10)
-
-# Displays the output file's name and location after successful sniffing
-print(f"\nResults saved to: {output_file}")
+# Main logic
+if __name__ == "__main__":
+    # Prompt the user to enter the network interface
+    network_interface = input("Enter the network interface to sniff on (e.g., eth0, wlan0): ")
+    
+    # Start packet sniffing
+    start_sniffing(interface=network_interface, count=10)  # Adjust count as needed
