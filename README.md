@@ -39,7 +39,7 @@ pip install scapy
 
 Clone the GitHub Repository:
 ```sh
-git clone https://github.com/techno-rabit/PACKETRON
+git clone https://github.com/vxnuprasad/PACKETRON
 ```
 
 Run:
